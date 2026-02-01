@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Subtask } from '../models/subtask';
 
 @Injectable({
@@ -16,7 +16,11 @@ export class SubtaskService {
   }
 
   getSubtasksByTaskId(taskId: number): Observable<Subtask[]> {
-    return this.http.get<Subtask[]>(`${this.apiUrl}/task/${taskId}`);
+    // The backend no longer provides GET /subtasks/task/{taskId}.
+    // Pull all subtasks and filter client-side.
+    return this.getSubtasks().pipe(
+      map(subtasks => subtasks.filter(s => s.taskId === taskId))
+    );
   }
 
   getSubtaskById(id: number): Observable<Subtask> {
